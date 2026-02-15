@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./html:/usr/share/nginx/html
+    depends_on:
+      - rstudio
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  rstudio:
+    image: rocker/rstudio:latest
+    container_name: rstudio
+    environment:
+      - DISABLE_AUTH=false
+      - PASSWORD=RStudio1234
+    volumes:
+      - ./rstudio-data:/home/rstudio
+      - ./r-packages:/usr/local/lib/R/site-library
+    expose:
+      - "8787"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
